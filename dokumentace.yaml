@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Skola OnLine API (Unofficial)
+  title: Skola Online API (Unofficial)
   version: 1.0.1
   description: Dokumentace API vytvořená na základě analýzy síťového provozu.
 
