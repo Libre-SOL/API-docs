@@ -4,10 +4,128 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Skola OnLine API Documentation</title>
+  
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+  
+  <style>
+    #theme-toggle {
+      position: fixed;
+      top: 12px;
+      right: 20px;
+      z-index: 10000;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: sans-serif;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    #theme-toggle:hover {
+      background-color: #f0f0f0;
+    }
+
+    body.dark-mode #theme-toggle {
+      background-color: #333;
+      color: #fff;
+      border-color: #555;
+    }
+    body.dark-mode #theme-toggle:hover {
+      background-color: #444;
+    }
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .swagger-ui .info .title, 
+    body.dark-mode .swagger-ui .info h1, body.dark-mode .swagger-ui .info h2, 
+    body.dark-mode .swagger-ui .info h3, body.dark-mode .swagger-ui .info h4, 
+    body.dark-mode .swagger-ui .info h5, body.dark-mode .swagger-ui .info p, 
+    body.dark-mode .swagger-ui .info li,
+    body.dark-mode .swagger-ui .scheme-container,
+    body.dark-mode .swagger-ui .opblock-tag,
+    body.dark-mode .swagger-ui .opblock .opblock-summary-operation-id,
+    body.dark-mode .swagger-ui .opblock .opblock-summary-path,
+    body.dark-mode .swagger-ui .opblock .opblock-summary-description,
+    body.dark-mode .swagger-ui .response-col_status,
+    body.dark-mode .swagger-ui table thead tr td, 
+    body.dark-mode .swagger-ui table thead tr th,
+    body.dark-mode .swagger-ui .tab li {
+      color: #e0e0e0 !important;
+    }
+
+    body.dark-mode .swagger-ui a.nostyle, 
+    body.dark-mode .swagger-ui .info a {
+      color: #89b3f8 !important;
+    }
+
+    body.dark-mode .swagger-ui .opblock {
+      background-color: #1e1e1e;
+      border-color: #333;
+    }
+    body.dark-mode .swagger-ui .opblock .opblock-section-header {
+      background-color: #262626;
+    }
+
+    body.dark-mode .swagger-ui input, 
+    body.dark-mode .swagger-ui textarea, 
+    body.dark-mode .swagger-ui select {
+      background-color: #2d2d2d !important;
+      color: #fff !important;
+      border: 1px solid #444 !important;
+    }
+
+    body.dark-mode .swagger-ui .model-box {
+      background-color: #1e1e1e;
+    }
+    body.dark-mode .swagger-ui section.models {
+      border-color: #333;
+    }
+    body.dark-mode .swagger-ui section.models h4 {
+      color: #e0e0e0;
+    }
+    body.dark-mode .swagger-ui .model {
+      color: #ccc;
+    }
+    body.dark-mode .swagger-ui .prop-type {
+      color: #fca5a5;
+    }
+
+    body.dark-mode .swagger-ui .scheme-container {
+      background: transparent;
+      box-shadow: none;
+      border-bottom: 1px solid #333;
+    }
+
+    body.dark-mode .swagger-ui .btn.authorize {
+      color: #89b3f8;
+      border-color: #89b3f8;
+    }
+    body.dark-mode .swagger-ui .btn.authorize svg {
+      fill: #89b3f8;
+    }
+    body.dark-mode .swagger-ui .btn {
+      color: #fff; 
+    }
+    body.dark-mode .swagger-ui .btn.cancel {
+       border-color: #555;
+    }
+
+    body.dark-mode .swagger-ui .microlight {
+      background-color: #000 !important;
+    }
+  </style>
 </head>
 <body>
+  
+  <button id="theme-toggle">🌙</button>
+
   <div id="swagger-ui"></div>
+
   <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
   <script>
     window.onload = () => {
@@ -20,9 +138,38 @@
           SwaggerUIBundle.SwaggerUIStandalonePreset
         ],
         layout: "BaseLayout",
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 1
+      });
+
+      const toggleBtn = document.getElementById('theme-toggle');
+      const body = document.body;
+
+      const enableDarkMode = () => {
+        body.classList.add('dark-mode');
+        toggleBtn.innerText = '☀️';
+        localStorage.setItem('theme', 'dark');
+      };
+
+      const disableDarkMode = () => {
+        body.classList.remove('dark-mode');
+        toggleBtn.innerText = '🌙';
+        localStorage.setItem('theme', 'light');
+      };
+
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        enableDarkMode();
+      }
+
+      toggleBtn.addEventListener('click', () => {
+        if (body.classList.contains('dark-mode')) {
+          disableDarkMode();
+        } else {
+          enableDarkMode();
+        }
       });
     };
   </script>
-
 </body>
 </html>
