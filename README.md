@@ -7,7 +7,7 @@ Tento repozitář obsahuje technickou specifikaci REST API školního systému �
 Interaktivní dokumentace je hostována pomocí GitHub Pages a využívá Swagger UI pro vizualizaci.
 
 **Odkaz na dokumentaci:**
-https://libre-sol.github.io/API-docs/
+https://libre-skolaonline.github.io/API-docs/
 
 ## Obsah repozitáře
 
