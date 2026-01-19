@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Škola Online API (Unofficial)
-  version: 1.0.1
+  version: 1.1.0
   description: Dokumentace API vytvořená na základě analýzy síťového provozu.
 
 servers:
@@ -18,7 +18,7 @@ paths:
   /connect/token:
     post:
       summary: Získání přístupového tokenu
-      description: Odeslání uživatelského jména a hesla. Vrací `access_token`, který se musí posílat v hlavičce všech dalších requestů.
+      description: Odeslání uživatelského jména a hesla. Vrací access_token, který se musí posílat v hlavičce všech dalších requestů.
       security: []
       requestBody:
         required: true
@@ -56,7 +56,7 @@ paths:
   /v1/user:
     get:
       summary: Informace o uživateli
-      description: Vrátí základní údaje o přihlášeném. Klíčové je získat `personID`, které se vkládá do URL pro známky a úkoly.
+      description: Vrátí základní údaje o přihlášeném. Klíčové je získat personID, které se vkládá do URL pro známky a úkoly.
       security:
         - bearerAuth: []
       responses:
@@ -69,102 +69,11 @@ paths:
                 properties:
                   personID:
                     type: string
-                    description: Unikátní ID studenta (např. D3167532).
+                    description: Unikátní ID studenta.
                   fullName:
                     type: string
                   userTypeText:
                     type: string
-
-  /v1/timeTable/codeLists:
-    get:
-      summary: Roky a Pololetí
-      description: Vrátí seznam školních roků a pololetí. Nutné pro zjištění `SemesterId`, aby se známky stahovaly pro aktuální období.
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: studentId
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  semester:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: ID pololetí (použít ve filtru známek).
-                        name:
-                          type: string
-                        dateFrom:
-                          type: string
-                        dateTo:
-                          type: string
-
-  /v1/students/{studentId}/marks/list:
-    get:
-      summary: Seznam známek
-      description: Vrátí seznam známek. Pozor, vrací odděleně pole známek a pole předmětů (nutno spárovat přes `subjectId`).
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: studentId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: SemesterId
-          in: query
-          description: ID aktuálního pololetí..
-          required: false
-          schema:
-            type: string
-        - name: SigningFilter
-          in: query
-          description: Filtr podepsanosti (nechat 'all').
-          schema:
-            type: string
-            default: all
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  marks:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        subjectId:
-                          type: string
-                        markText:
-                          type: string
-                        theme:
-                          type: string
-                        date:
-                          type: string
-                  subjects:
-                    type: array
-                    description: Řazení předmětů pro přiřazení názvů.
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
 
   /v1/timeTable:
     get:
@@ -225,6 +134,103 @@ paths:
                                   abbrev:
                                     type: string
 
+  /v1/students/{studentId}/marks/list:
+    get:
+      summary: Seznam známek (Všechny)
+      description: Vrátí seznam známek. Pozor, vrací odděleně pole známek a číselník předmětů (nutno spárovat přes subjectId).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: SemesterId
+          in: query
+          description: ID aktuálního pololetí.
+          required: false
+          schema:
+            type: string
+        - name: SigningFilter
+          in: query
+          description: Filtr podepsanosti (nechat 'all').
+          schema:
+            type: string
+            default: all
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  marks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        subjectId:
+                          type: string
+                        markText:
+                          type: string
+                        theme:
+                          type: string
+                        date:
+                          type: string
+                  subjects:
+                    type: array
+                    description: Číselník předmětů pro přiřazení názvů.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+
+  /v1/messages/received:
+    get:
+      summary: Přijaté zprávy
+      description: Vrátí seznam přijatých zpráv.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Pagination.PageNumber
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: Pagination.PageSize
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        senderName:
+                          type: string
+                        subject:
+                          type: string
+                        sentDate:
+                          type: string
+                        text:
+                          type: string
+
   /v1/students/{studentId}/homeworks:
     get:
       summary: Domácí úkoly
@@ -243,6 +249,14 @@ paths:
             type: string
             enum: [active, all]
             default: active
+        - name: Pagination.PageNumber
+          in: query
+          schema:
+            type: integer
+        - name: Pagination.PageSize
+          in: query
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
@@ -262,8 +276,231 @@ paths:
                           type: string
                         detailedDescription:
                           type: string
+                        attachments:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
                         subject:
                           type: object
                           properties:
                             name:
                               type: string
+
+  /v1/students/{studentId}/behaviors:
+    get:
+      summary: Chování a poznámky
+      description: Vrátí seznam výchovných opatření a poznámek k chování.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Pagination.PageNumber
+          in: query
+          schema:
+            type: integer
+        - name: Pagination.PageSize
+          in: query
+          schema:
+            type: integer
+        - name: RecordsFilter
+          in: query
+          schema:
+            type: string
+            default: all
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  behaviors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        behaviorReason:
+                          type: string
+                        kindOfBehaviorName:
+                          type: string
+                        date:
+                          type: string
+                  numberProcessed:
+                    type: integer
+
+  /v1/timeTable/codeLists:
+    get:
+      summary: Číselníky rozvrhu (Pololetí)
+      description: Vrátí definice školních roků a ID pololetí. Nutné pro filtrování známek.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  semester:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID pololetí.
+                        name:
+                          type: string
+                        dateFrom:
+                          type: string
+                        dateTo:
+                          type: string
+
+  /v1/students/{studentId}/marks/bySubject:
+    get:
+      summary: Známky dle předmětů
+      description: Alternativní pohled na známky, seskupený podle předmětů. Často obsahuje průměry.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: SemesterId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /v1/student/marks/{markId}:
+    get:
+      summary: Detail konkrétní známky
+      description: Vrátí detail jedné známky podle jejího ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: markId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: StudentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  markText:
+                    type: string
+                  theme:
+                    type: string
+                  weight:
+                    type: number
+
+  /v1/messages/settings:
+    get:
+      summary: Nastavení zpráv
+      description: Vrátí konfiguraci zpráv pro uživatele (povolené kanály, možnosti hlasování atd.).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: boolean
+                  senderOfEmail:
+                    type: array
+                    items:
+                      type: string
+                  sms:
+                    type: boolean
+                  listOfVotingOptions:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: string
+
+  /v1/student/homeworks/assignment/attachments/{attachmentId}:
+    get:
+      summary: Stažení přílohy úkolu
+      description: Získá binární data nebo odkaz na přílohu domácího úkolu.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: StudentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /v1/students/{studentId}/marks/final:
+    get:
+      summary: Vysvědčení
+      description: Vrátí závěrečné známky na vysvědčení.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /v1/marks/codeLists:
+    get:
+      summary: Číselníky známek
+      description: Vrátí definice typů hodnocení (váhy, druhy známek atd.).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: StudentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
