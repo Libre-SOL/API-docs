@@ -17,47 +17,47 @@ components:
 paths:
   /connect/token:
     post:
-      summary: OAuth2 Token Endpoint
+      summary: Získání přístupového tokenu
       description: |
-        Slouží k získání i obnovení access tokenu.
-        Podporovane grant typy:
-        - password
-        - refresh_token
+        OAuth2 token endpoint.
+        
+        Podporuje dva grant typy:
+        1. `password` – poskytněte `username` a `password`.
+        2. `refresh_token` – poskytněte `refresh_token`.
       security: []
       requestBody:
         required: true
         content:
           application/x-www-form-urlencoded:
             schema:
-              oneOf:
-                - type: object
-                  required: [grant_type, username, password, client_id]
-                  properties:
-                    grant_type:
-                      type: string
-                      enum: [password]
-                    username:
-                      type: string
-                    password:
-                      type: string
-                    client_id:
-                      type: string
-                    scope:
-                      type: string
-                      example: openid offline_access profile sol_api
-                - type: object
-                  required: [grant_type, refresh_token, client_id]
-                  properties:
-                    grant_type:
-                      type: string
-                      enum: [refresh_token]
-                    refresh_token:
-                      type: string
-                    client_id:
-                      type: string
+              type: object
+              required:
+                - grant_type
+                - client_id
+              properties:
+                grant_type:
+                  type: string
+                  description: Typ grant. Buď `password` nebo `refresh_token`.
+                  example: password
+                username:
+                  type: string
+                  description: Uživatelské jméno (povinné pro `password` grant)
+                password:
+                  type: string
+                  description: Heslo (povinné pro `password` grant)
+                refresh_token:
+                  type: string
+                  description: Refresh token (povinné pro `refresh_token` grant)
+                client_id:
+                  type: string
+                  example: test_client
+                scope:
+                  type: string
+                  description: Povinné pro `password` grant, volitelné pro `refresh_token`
+                  example: openid offline_access profile sol_api
       responses:
         '200':
-          description: Token response
+          description: Úspěšné přihlášení / obnovení tokenu.
           content:
             application/json:
               schema:
@@ -69,9 +69,6 @@ paths:
                     type: string
                   expires_in:
                     type: integer
-                  token_type:
-                    type: string
-                    example: Bearer
   /v1/user:
     get:
       summary: Informace o uživateli
