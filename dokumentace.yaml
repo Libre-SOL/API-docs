@@ -17,32 +17,47 @@ components:
 paths:
   /connect/token:
     post:
-      summary: Získání přístupového tokenu
-      description: Odeslání uživatelského jména a hesla. Vrací access_token.
+      summary: OAuth2 Token Endpoint
+      description: |
+        Slouží k získání i obnovení access tokenu.
+        Podporovane grant typy:
+        - password
+        - refresh_token
       security: []
       requestBody:
         required: true
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              properties:
-                grant_type:
-                  type: string
-                  example: password
-                username:
-                  type: string
-                password:
-                  type: string
-                client_id:
-                  type: string
-                  example: test_client
-                scope:
-                  type: string
-                  example: openid offline_access profile sol_api
+              oneOf:
+                - type: object
+                  required: [grant_type, username, password, client_id]
+                  properties:
+                    grant_type:
+                      type: string
+                      enum: [password]
+                    username:
+                      type: string
+                    password:
+                      type: string
+                    client_id:
+                      type: string
+                    scope:
+                      type: string
+                      example: openid offline_access profile sol_api
+                - type: object
+                  required: [grant_type, refresh_token, client_id]
+                  properties:
+                    grant_type:
+                      type: string
+                      enum: [refresh_token]
+                    refresh_token:
+                      type: string
+                    client_id:
+                      type: string
       responses:
         '200':
-          description: Úspěšné přihlášení.
+          description: Token response
           content:
             application/json:
               schema:
@@ -50,9 +65,13 @@ paths:
                 properties:
                   access_token:
                     type: string
+                  refresh_token:
+                    type: string
                   expires_in:
                     type: integer
-
+                  token_type:
+                    type: string
+                    example: Bearer
   /v1/user:
     get:
       summary: Informace o uživateli
