@@ -100,6 +100,32 @@ paths:
                       name:
                         type: string
 
+  /v1/user/notifications:
+    get:
+      summary: Počty notifikací
+      description: Vrátí souhrn notifikací pro jednotlivé moduly.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        moduleId:
+                          type: string
+                          example: api_zpravy_zak
+                        count:
+                          type: integer
+                          example: 0
+
   /v1/timeTable:
     get:
       summary: Rozvrh hodin
@@ -212,6 +238,8 @@ paths:
                           type: number
                         isPoints:
                           type: boolean
+                        verbalEvaluation:
+                          type: string
                   subjects:
                     type: array
                     description: Číselník předmětů (ID -> Název).
@@ -305,7 +333,52 @@ paths:
                             type:
                               type: string
                               description: např. employee
-
+  /v1/messages/sent:
+    get:
+      summary: Odeslané zprávy
+      description: Vrátí seznam odeslaných zpráv s objektem odesílatele.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Pagination.PageNumber
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: Pagination.PageSize
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        subject:
+                          type: string
+                        sentDate:
+                          type: string
+                        text:
+                          type: string
+                        read:
+                          type: boolean
+                        sender:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                              description: např. employee
   /v1/students/{studentId}/homeworks:
     get:
       summary: Domácí úkoly
